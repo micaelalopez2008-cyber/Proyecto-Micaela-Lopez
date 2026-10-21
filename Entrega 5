@@ -1,0 +1,120 @@
+USE Ventas_Tech_DB_91060;
+
+    //Pre-entrega: Consultas con JOINs para el proyecto
+    Título: Cruzando tablas para enriquecer el análisis
+
+    Tablas utilizadas:
+    - categorias
+    - clientes
+    - productos
+    - ventas//
+
+-- =============================================================
+-- Consulta 1: Vista base del proyecto (INNER JOIN)
+-- =============================================================
+
+SELECT
+    v.id_venta AS ID_Venta,
+    v.fecha_venta AS Fecha_Venta,
+    c.id_cliente AS ID_Cliente,
+    c.nombre AS Cliente,
+    c.email AS Email,
+    c.ciudad AS Ciudad,
+    p.id_producto AS ID_Producto,
+    p.nombre_producto AS Producto,
+    cat.nombre_categoria AS Categoria,
+    v.cantidad AS Cantidad,
+    v.precio_unitario AS Precio_Unitario,
+    v.cantidad * v.precio_unitario AS Total_Venta
+FROM ventas v
+INNER JOIN clientes c
+    ON v.id_cliente = c.id_cliente
+INNER JOIN productos p
+    ON v.id_producto = p.id_producto
+INNER JOIN categorias cat
+    ON p.id_categoria = cat.id_categoria
+ORDER BY v.fecha_venta;
+
+-- Hallazgo:
+-- La vista integra la información de ventas, clientes,
+-- productos y categorías en una única fuente para Power BI.
+
+-- =============================================================
+-- Consulta 2: Clientes sin ventas (LEFT JOIN)
+-- Propósito: detectar clientes registrados que nunca compraron.
+-- =============================================================
+
+SELECT
+    c.nombre AS Cliente,
+    c.email AS Email,
+    c.fecha_registro AS Fecha_Registro
+FROM clientes c
+LEFT JOIN ventas v
+    ON c.id_cliente = v.id_cliente
+WHERE v.id_venta IS NULL;
+
+-- Hallazgo:
+-- No se encontraron clientes sin ventas.
+-- Los 5 clientes registrados realizaron al menos una compra,
+-- por lo que CRM no tiene clientes inactivos para contactar.
+
+
+-- =============================================================
+-- Consulta 3: Productos sin ventas (LEFT JOIN)
+-- Propósito: identificar productos del catálogo sin movimiento.
+-- =============================================================
+
+SELECT
+    p.nombre_producto AS Producto,
+    cat.nombre_categoria AS Categoria,
+    p.precio AS Precio
+FROM productos p
+INNER JOIN categorias cat
+    ON p.id_categoria = cat.id_categoria
+LEFT JOIN ventas v
+    ON p.id_producto = v.id_producto
+WHERE v.id_venta IS NULL;
+
+-- Hallazgo:
+-- No se encontraron productos sin ventas.
+-- Los 6 productos del catálogo registran al menos una venta,
+-- por lo que no existen artículos sin movimiento.
+
+
+-- =============================================================
+-- Consulta 4: Consolidado por canal (UNION ALL)
+-- Propósito: comparar la facturación de Buenos Aires
+-- versus el resto de las ciudades.
+-- =============================================================
+
+SELECT
+    canal,
+    SUM(total) AS Total_Canal
+FROM
+(
+    SELECT
+        v.fecha_venta,
+        v.cantidad * v.precio_unitario AS total,
+        'Buenos Aires' AS canal
+    FROM ventas v
+    INNER JOIN clientes c
+        ON v.id_cliente = c.id_cliente
+    WHERE c.ciudad = 'Buenos Aires'
+
+    UNION ALL
+
+    SELECT
+        v.fecha_venta,
+        v.cantidad * v.precio_unitario AS total,
+        'Interior' AS canal
+    FROM ventas v
+    INNER JOIN clientes c
+        ON v.id_cliente = c.id_cliente
+    WHERE c.ciudad <> 'Buenos Aires'
+) consolidado
+GROUP BY canal;
+
+-- Hallazgo:
+-- El Interior concentra la mayor parte de la facturación
+-- con $3.804, mientras que Buenos Aires aporta $2.640.
+-- Esto indica que las ventas están más distribuidas en el interior del país.
