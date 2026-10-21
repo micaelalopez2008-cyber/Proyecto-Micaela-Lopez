@@ -1,1 +1,74 @@
+USE Ventas_Tech_DB_91060;
 
+   // Pre-entrega: Consultas SQL de negocio
+    Título: Extrayendo métricas clave con SQL
+    Tabla utilizada: ventas//
+
+-- =====================================================
+-- Consulta 1 - Resumen ejecutivo mensual
+-- =====================================================
+SELECT
+    MONTH(fecha_venta) AS Mes,
+    SUM(cantidad * precio_unitario) AS Total_Facturado,
+    COUNT(*) AS Cantidad_Pedidos,
+    AVG(cantidad * precio_unitario) AS Ticket_Promedio
+FROM ventas
+GROUP BY MONTH(fecha_venta)
+ORDER BY Mes;
+
+-- =====================================================
+-- Consulta 2 - Ranking de productos
+-- =====================================================
+SELECT TOP 5
+    id_producto AS ID_Producto,
+    SUM(cantidad) AS Unidades_Vendidas,
+    SUM(cantidad * precio_unitario) AS Total_Facturado
+FROM ventas
+GROUP BY id_producto
+ORDER BY Total_Facturado DESC;
+
+-- =====================================================
+-- Consulta 3 - Clientes recurrentes
+-- =====================================================
+SELECT
+    id_cliente AS ID_Cliente,
+    COUNT(*) AS Cantidad_Pedidos,
+    SUM(cantidad * precio_unitario) AS Total_Gastado
+FROM ventas
+GROUP BY id_cliente
+HAVING COUNT(*) > 1
+ORDER BY Total_Gastado DESC;
+
+-- =====================================================
+-- Consulta 4 - Meses por encima o por debajo del promedio
+-- =====================================================
+WITH Facturacion_Mensual AS (
+    SELECT
+        MONTH(fecha_venta) AS Mes,
+        SUM(cantidad * precio_unitario) AS Total_Facturado
+    FROM ventas
+    GROUP BY MONTH(fecha_venta)
+),
+Promedio_Mensual AS (
+    SELECT
+        AVG(Total_Facturado) AS Promedio_General_Mensual
+    FROM Facturacion_Mensual
+)
+SELECT
+    fm.Mes,
+    fm.Total_Facturado,
+    pm.Promedio_General_Mensual,
+    CASE
+        WHEN fm.Total_Facturado >= pm.Promedio_General_Mensual
+            THEN 'Por encima'
+        ELSE 'Por debajo'
+    END AS Comparacion_Promedio
+FROM Facturacion_Mensual AS fm
+CROSS JOIN Promedio_Mensual AS pm
+ORDER BY fm.Mes;
+
+-- =====================================================
+-- Bloque de cierre - Hallazgos
+-- Hallazgo 1: El mes 3 registró la mayor facturación, con un total de $6444.
+-- Hallazgo 2: El producto 3 lideró el ranking de facturación, con 3 unidades vendidas y una facturacion de $3600
+-- Hallazgo 3: El cliente 1 fue el cliente recurrente con mayor gasto, con 2 pedidos y un total de $2640.
