@@ -1,0 +1,95 @@
+# RetailPro - Proyecto de análisis de ventas
+
+## Descripción
+
+RetailPro es un proyecto de análisis de datos comerciales desarrollado con SQL Server.
+
+El proyecto utiliza información de ventas, clientes, productos y categorías para generar métricas e insights que permitan analizar el desempeño comercial.
+
+## Objetivo
+
+El objetivo principal es transformar datos de ventas en información útil para la toma de decisiones.
+
+Entre los análisis desarrollados se encuentran:
+
+- Facturación mensual.
+- Cantidad de pedidos.
+- Ticket promedio.
+- Ranking de productos.
+- Identificación de clientes recurrentes.
+- Comparación de facturación mensual.
+- Análisis de clientes sin ventas.
+- Análisis de productos sin movimiento.
+- Facturación por ubicación geográfica.
+
+## Base de datos
+
+Base utilizada:
+
+Ventas_Tech_DB_91060
+
+Las principales tablas analizadas son:
+
+- ventas
+- clientes
+- productos
+- categorias
+
+## Herramientas utilizadas
+
+- SQL Server
+- SQL Server Management Studio (SSMS)
+- GitHub
+- Microsoft Copilot
+- Power BI
+
+## Estructura del análisis
+
+Las consultas SQL fueron desarrolladas progresivamente durante el proyecto.
+
+Se utilizaron operaciones como:
+
+- SELECT
+- SUM
+- AVG
+- COUNT
+- GROUP BY
+- HAVING
+- CASE
+- CTE
+- INNER JOIN
+- LEFT JOIN
+- UNION ALL
+
+Estas consultas permiten pasar desde análisis individuales de la tabla de ventas hasta una vista consolidada que relaciona clientes, productos, categorías y transacciones.
+
+## Ejecución de los scripts
+
+1. Abrir SQL Server Management Studio.
+2. Conectarse a la instancia de SQL Server correspondiente.
+3. Seleccionar la base de datos Ventas_Tech_DB_91060.
+4. Abrir el script SQL que se desea ejecutar.
+5. Ejecutar el script.
+6. Revisar los resultados obtenidos.
+
+También puede utilizarse:
+
+USE Ventas_Tech_DB_91060;
+
+antes de ejecutar las consultas.
+
+## Uso de IA
+
+Microsoft Copilot fue utilizado como herramienta de apoyo durante el proyecto para:
+
+- Revisar consultas SQL.
+- Detectar posibles mejoras.
+- Interpretar resultados.
+- Generar documentación.
+- Crear una primera versión de este README.
+
+Las recomendaciones generadas por IA fueron revisadas antes de ser incorporadas al proyecto.
+
+## Autor
+
+Micaela Lopez
